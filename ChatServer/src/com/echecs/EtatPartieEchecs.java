@@ -22,8 +22,10 @@ public class EtatPartieEchecs {
 
     public void setEtatEchiquier(String echiquier) {
         String[] chaine = echiquier.split("\n");
-        char[][] etatEchiquier = new char[8][8];
-        for (int i = 0; i <8; i++){
+        //WARNING ne marche pas, je sais pas comment fix
+//        throw new RuntimeException(chaine[1]);
+//        char[][] etatEchiquier = new char[8][8];
+        for (int i = 0; i < 8; i++){
             etatEchiquier[i] = chaine[i].toCharArray() ;
         }
         this.etatEchiquier = etatEchiquier;

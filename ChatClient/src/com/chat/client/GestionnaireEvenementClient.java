@@ -102,6 +102,7 @@ public class GestionnaireEvenementClient implements GestionnaireEvenement {
                 case "MOVE":
                 {
                     System.out.println("_____________________________________");
+//                    throw new RuntimeException(evenement.getArgument());
                     client.setEtatPartieEchecs(evenement.getArgument());
                     System.out.println(client.getEtatPartieEchecs().toString());
                     break;
