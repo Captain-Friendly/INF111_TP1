@@ -27,7 +27,7 @@ import com.chat.commun.thread.ThreadEcouteurDeTexte;
  * @version 1.0
  * @since 2023-09-01
  */
-public class Client implements Lecteur {
+public abstract class Client implements Lecteur {
 
     private String adrServeur = Config.ADRESSE_SERVEUR;
     private int portServeur = Config.PORT_SERVEUR;
@@ -56,7 +56,7 @@ public class Client implements Lecteur {
             this.setPortServeur(portServeur);
 
             //On cree l'ecouteur d'evenements pour le client :
-            gestionnaireEvenementClient = new GestionnaireEvenementClient(this);
+            gestionnaireEvenementClient = new GestionnaireEvenementClient((ClientChat) this);
 
             //Démarrer le thread inspecteur de texte:
             vt = new ThreadEcouteurDeTexte(this);

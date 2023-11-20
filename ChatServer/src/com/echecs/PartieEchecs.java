@@ -1,10 +1,7 @@
 package com.echecs;
 
-import com.echecs.pieces.Piece;
-import com.echecs.pieces.Roi;
+import com.echecs.pieces.*;
 import com.echecs.util.EchecsUtil;
-import com.sun.xml.internal.bind.v2.TODO;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Représente une partie de jeu d'échecs. Orcheste le déroulement d'une partie :
@@ -39,7 +36,42 @@ public class PartieEchecs {
     public PartieEchecs() {
         echiquier = new Piece[8][8];
         //Placement des pièces :
+        char[][] board = {
+                {'t','c','f','d','r','f','c','t'},
+                {'p','p','p','p','p','p','p','p'},
+                {' ',' ',' ',' ',' ',' ',' ',' '},
+                {' ',' ',' ',' ',' ',' ',' ',' '},
+                {' ',' ',' ',' ',' ',' ',' ',' '},
+                {' ',' ',' ',' ',' ',' ',' ',' '},
+                {'P','P','P','P','P','P','P','P'},
+                {'T','C','F','D','R','F','C','T'}
+        };
 
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j<8; j++){
+                char couleur;
+                if (Character.isUpperCase(board[i][j]))
+//                    throw new RuntimeException("isUpper:"+Character.isUpperCase(board[i][j])+" Char: "+board[i][j]);
+                    couleur = 'b';
+                else
+                    couleur = 'n';
+                char piece = Character.toLowerCase(board[i][j]);
+                if (piece == 't')
+                    echiquier[i][j] = new Tour(couleur);
+                else if (piece == 'c')
+                    echiquier[i][j] = new Cavalier(couleur);
+                else if (piece == 'f')
+                    echiquier[i][j] = new Fou(couleur);
+                else if (piece == 'd')
+                    echiquier[i][j] = new Dame(couleur);
+                else if (piece == 'r')
+                    echiquier[i][j] = new Roi(couleur);
+                else if (piece == 'p')
+                    echiquier[i][j] = new Pion(couleur);
+                else if (piece == ' ')
+                    echiquier[i][j] = null;
+            }
+        }
     }
 
     /**
@@ -68,16 +100,18 @@ public class PartieEchecs {
     public boolean deplace(Position initiale, Position finale) {
         if (!EchecsUtil.positionValide(initiale) || !EchecsUtil.positionValide(finale))
             return false; //Position invalide
-
+//        throw new RuntimeException("Position initial:"+EchecsUtil.positionValide(initiale)+"\tPosition final:"+EchecsUtil.positionValide(finale));
         Piece piece = null;
         for (int i = 0; i<echiquier.length; i++)
             for (int j = 0; j<echiquier[i].length;j++)
                 if (EchecsUtil.indiceLigne(initiale) == i && EchecsUtil.indiceColonne(initiale) == j)
                     piece=echiquier[i][j];
         if (piece==null)
+//            throw new RuntimeException("Piece vide\nInitial:"+initiale.getColonne()+initiale.getLigne()+"\nIndice ligne:"+EchecsUtil.indiceLigne(initiale)+" Indice colone:"+EchecsUtil.indiceColonne(initiale));
             return false; //Pas de piece a deplacer
 
         if (piece.getCouleur() != getTour())
+//            throw new RuntimeException("pas le tour\nInitial:"+initiale.getColonne()+initiale.getLigne()+"\nIndice ligne:"+EchecsUtil.indiceLigne(initiale)+" Indice colone:"+EchecsUtil.indiceColonne(initiale));
             return false; //Pas le tour de cette couleur
 
         //TODO: check for castle
@@ -86,8 +120,10 @@ public class PartieEchecs {
         for (int i = 0; i<echiquier.length; i++)
             for (int j = 0; j<echiquier[i].length;j++)
                 if (EchecsUtil.indiceLigne(finale) == i && EchecsUtil.indiceColonne(finale) == j)
-                    if (echiquier[i][j].getCouleur() == piece.getCouleur())
-                        return false; // on ne peut pas capturer un piece de la meme couleur
+                    if (echiquier[i][j] != null)
+                        if (echiquier[i][j].getCouleur() == piece.getCouleur())
+//                            throw new RuntimeException("meme couleur attaque");
+                          return false; // on ne peut pas capturer un piece de la meme couleur
 
 
         Piece[][] passe = echiquier.clone();
@@ -98,12 +134,40 @@ public class PartieEchecs {
         if (estEnEchec() == tour)// si on est toujours en echec apres le mouvement on reverse et c'est invalide
         {
             echiquier = passe;
+//            throw new RuntimeException("En echec:"+estEnEchec());
             return false;
         }
 
         changerTour();
         return true;
     }
+
+    public String getBoard()
+    {
+        String board = "";
+        for (int i =0; i < 8; i++){
+            for (int j=0;j<8; j++)
+            {
+                if (echiquier[i][j] instanceof Tour)
+                    board+=echiquier[i][j].getCouleur()=='b'?'T':'t';
+                else if (echiquier[i][j] instanceof Cavalier)
+                    board+=echiquier[i][j].getCouleur()=='b'?'C':'c';
+                else if (echiquier[i][j] instanceof Fou)
+                    board+=echiquier[i][j].getCouleur()=='b'?'F':'f';
+                else if (echiquier[i][j] instanceof Dame)
+                    board+=echiquier[i][j].getCouleur()=='b'?'D':'d';
+                else if (echiquier[i][j] instanceof Roi)
+                    board+=echiquier[i][j].getCouleur()=='b'?'R':'r';
+                else if (echiquier[i][j] instanceof Pion)
+                    board+=echiquier[i][j].getCouleur()=='b'?'P':'p';
+                else if (echiquier[i][j] == null)
+                    board+=' ';
+            }
+            board+='\n';
+        }
+        return board;
+    }
+
 
     /**
      * Vérifie si un roi est en échec et, si oui, retourne sa couleur sous forme
@@ -139,13 +203,15 @@ public class PartieEchecs {
         {
             for (int j = 0; j<echiquier[i].length;j++)
             {
-                if (echiquier[i][j].getCouleur()=='b')//si une piece blanche
-                    if (echiquier[i][j].peutSeDeplacer(EchecsUtil.getPosition((byte)i,(byte)j),posRoiNoir,echiquier))
-                        return 'n';
-                if (echiquier[i][j].getCouleur()=='n')//si une piece blanche
-                    if (echiquier[i][j].peutSeDeplacer(EchecsUtil.getPosition((byte)i,(byte)j),posRoiBlanc,echiquier))
-                        return 'b';
-
+                if (echiquier[i][j] != null)
+                {
+                    if (echiquier[i][j].getCouleur()=='b')//si une piece blanche
+                        if (echiquier[i][j].peutSeDeplacer(EchecsUtil.getPosition((byte)i,(byte)j),posRoiBlanc,echiquier))
+                            return 'n';
+                    if (echiquier[i][j].getCouleur()=='n')//si une piece blanche
+                        if (echiquier[i][j].peutSeDeplacer(EchecsUtil.getPosition((byte)i,(byte)j),posRoiNoir,echiquier))
+                            return 'b';
+                }
             }
         }
         return 'g';
@@ -193,6 +259,15 @@ public class PartieEchecs {
     public char getCouleurJoueur1() {
         return couleurJoueur1;
     }
+
+    public void setCouleurJoueur1(char couleurJoueur1) {
+        this.couleurJoueur1 = couleurJoueur1;
+    }
+
+    public void setCouleurJoueur2(char couleurJoueur2) {
+        this.couleurJoueur2 = couleurJoueur2;
+    }
+
     /**
      * Retourne la couleur n ou b du deuxième joueur.
      * @return char couleur du deuxième joueur.

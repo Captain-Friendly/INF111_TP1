@@ -22,7 +22,8 @@ public class ServeurChat extends Serveur {
      */
     private Vector<String> historique = new Vector<String>();
     ArrayList<Invitation> invitations= new ArrayList<Invitation>();
-    ArrayList<SalonPrive> salonsPrives = new ArrayList<SalonPrive>();
+    ArrayList<Invitation> invitationsEchec = new ArrayList<Invitation>();
+    public ArrayList<SalonPrive> salonsPrives = new ArrayList<SalonPrive>();
 
     public ServeurChat(int port) {
         super(port);
@@ -159,4 +160,45 @@ public class ServeurChat extends Serveur {
             s+="\t\t\tVous a/ont envoyer une invitation\n";
         return s;
     }
+
+    public SalonPrive getPartieEchec(String aliasHote)
+    {
+        for(SalonPrive sal: this.salonsPrives)
+            if (sal.getAliasHote().equals(aliasHote) || sal.getAliasInviter().equals(aliasHote))
+                if (sal.getPartieEchecs() != null)
+                    return sal;
+        return null;
+    }
+    public SalonPrive getSalonPrive(String aliasHote, String aliasInviter)
+    {
+        for(SalonPrive sal: this.salonsPrives) {
+            if (
+                    (sal.getAliasHote().equals(aliasHote) && sal.getAliasInviter().equals(aliasInviter))
+                            || (sal.getAliasHote().equals(aliasInviter) && sal.getAliasInviter().equals(aliasHote)))
+            {
+                return sal;
+            }
+        }
+        return null;
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

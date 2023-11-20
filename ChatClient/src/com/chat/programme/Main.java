@@ -24,7 +24,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		Scanner clavier = new Scanner(System.in);
-		Client client = new ClientChat();
+		ClientChat client = new ClientChat();
 		String saisie;
 
 		if (!client.connecter()) {
